@@ -535,6 +535,13 @@ def fast_api_common_options():
             " for Cloud Run."
         ),
     )
+    @click.option(
+        "--enable_a2a",
+        is_flag=True,
+        show_default=True,
+        default=False,
+        help="Optional. Whether to enable A2A endpoint.",
+    )
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
       return func(*args, **kwargs)
@@ -574,7 +581,8 @@ def cli_web(
     artifact_service_uri: Optional[str] = None,
     memory_service_uri: Optional[str] = None,
     session_db_url: Optional[str] = None,  # Deprecated
-    artifact_storage_uri: Optional[str] = None,  # Deprecated
+    artifact_storage_uri: Optional[str] = None,
+    enable_a2a: bool = False,
 ):
   """Starts a FastAPI server with Web UI for agents.
 
@@ -620,6 +628,9 @@ def cli_web(
       web=True,
       trace_to_cloud=trace_to_cloud,
       lifespan=_lifespan,
+      enable_a2a=enable_a2a,
+      host=host,
+      port=port,
   )
   config = uvicorn.Config(
       app,
@@ -665,6 +676,7 @@ def cli_api_server(
     memory_service_uri: Optional[str] = None,
     session_db_url: Optional[str] = None,  # Deprecated
     artifact_storage_uri: Optional[str] = None,  # Deprecated
+    enable_a2a: bool = False,
 ):
   """Starts a FastAPI server for agents.
 
@@ -688,6 +700,9 @@ def cli_api_server(
           allow_origins=allow_origins,
           web=False,
           trace_to_cloud=trace_to_cloud,
+          enable_a2a=enable_a2a,
+          host=host,
+          port=port,
       ),
       host=host,
       port=port,
@@ -799,6 +814,7 @@ def cli_deploy_cloud_run(
     memory_service_uri: Optional[str] = None,
     session_db_url: Optional[str] = None,  # Deprecated
     artifact_storage_uri: Optional[str] = None,  # Deprecated
+    enable_a2a: bool = False,
 ):
   """Deploys an agent to Cloud Run.
 
@@ -829,6 +845,7 @@ def cli_deploy_cloud_run(
         session_service_uri=session_service_uri,
         artifact_service_uri=artifact_service_uri,
         memory_service_uri=memory_service_uri,
+        enable_a2a=enable_a2a,
     )
   except Exception as e:
     click.secho(f"Deploy failed: {e}", fg="red", err=True)
